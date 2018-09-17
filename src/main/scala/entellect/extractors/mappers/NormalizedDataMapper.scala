@@ -22,8 +22,7 @@ import org.apache.spark.sql.streaming.Trigger
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{Row, SparkSession}
 import scala.collection.JavaConverters._
-
-
+import decoder._
 
 object KarmaContext {
   lazy val startContext = {
@@ -111,24 +110,19 @@ object NormalizedDataMapper extends App {
     .option("failOnDataLoss", false)
     .load().selectExpr("value as message")
 
-  val rdf = df.mapPartitions{ it => {
+  val rdf = df.mapPartitions{ binaryDfIt => {
 
-    if (it.hasNext) {
+    if (binaryDfIt.hasNext) {
 
       import KryoContext._
-      val kryo = kryoPool.obtain()
-      val data = it.toList.map(r => r.getAs[Array[Byte]]("message")).map{ binaryMsg =>
-        val input = new Input(new ByteArrayInputStream(binaryMsg), 4096)
-        val value = kryo.readClassAndObject(input).asInstanceOf[RawData]
-        input.close()
-        value
-      }
-      kryoPool.free(kryo)
+      import DataDecoderService._
 
-      val headers   = data.head.normalVal.toList.unzip._1
-      val values    = data.map(rawData => rawData.normalVal.toList.unzip._2)
-      val modelName = data.head.modelName
-      val modelFile = data.head.modelFile
+
+      val rawDataList = decodeData(binaryDfIt.toList, kryoPool)
+      val headers   = rawDataList.head.normalVal.toList.unzip._1
+      val values    = rawDataList.map(rawData => rawData.normalVal.toList.unzip._2)
+      val modelName = rawDataList.head.modelName
+      val modelFile = rawDataList.head.modelFile
 
       import KarmaContext._
       startContext
