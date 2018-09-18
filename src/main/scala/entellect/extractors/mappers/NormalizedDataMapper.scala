@@ -11,6 +11,9 @@ import org.apache.spark.sql.types._
 import org.apache.spark.sql.{Row, SparkSession}
 import entellect.extractors.mappers.transformations._
 
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
+
 object NormalizedDataMapper extends App {
 
   val spark        = SparkSession.builder()
@@ -25,6 +28,7 @@ object NormalizedDataMapper extends App {
     .option("kafka.bootstrap.servers", "127.0.0.1:9092")
     .option("subscribe", "test")
     .option("startingOffsets", "earliest")
+    .option("maxOffsetsPerTrigger", 10000)
     .option("failOnDataLoss", false)
     .load().selectExpr("value as message")
 
@@ -36,10 +40,17 @@ object NormalizedDataMapper extends App {
       import KarmaContext._
       import DataDecoderService._
       import DataTransformationService._
+      import ExecutionContext._
 
       val rawDataList = decodeData(binaryDfIt.toList, kryoPool)
-      val rowsOfRdf = mapRawDataToRowRdf(rdfGenerator, rawDataList, context)
-      rowsOfRdf.toIterator
+      val groups      = rawDataList.groupBy(rd => (rd.modelName, rd.sourceType)).toSeq
+      val seqFuture   = groups.foldLeft { Seq(Future.successful(Seq[Row]())) } {(a, b) =>
+        a ++ mapRawDataToRowRdf(rdfGenerator, b, context)
+      }
+      val futureSeq = Future.sequence(seqFuture)
+      val rdfRows = Await.result(futureSeq, Duration.Inf).flatten
+
+      rdfRows.toIterator
 
     }else
       Iterator[Row]()
