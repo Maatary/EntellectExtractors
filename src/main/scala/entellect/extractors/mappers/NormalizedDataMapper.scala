@@ -22,6 +22,8 @@ object NormalizedDataMapper extends App {
     .config("spark.executor.memory", "8G")
     .getOrCreate()
 
+  spark.sparkContext.setLogLevel("DEBUG")
+
   val df = spark
     .readStream
     .format("kafka")
@@ -55,15 +57,24 @@ object NormalizedDataMapper extends App {
     }else
       Iterator[Row]()
   }
-  }(RowEncoder.apply(StructType(List(StructField("blob", StringType, false)))))
+  }(RowEncoder.apply(StructType(List(StructField("value", StringType, false)))))
 
 
+  rdf
+    .writeStream
+    .trigger(Trigger.ProcessingTime("1 seconds"))
+    .format("kafka")
+    .outputMode("append")
+    .option("kafka.bootstrap.servers", "127.0.0.1:9092")
+    .option("topic", "NormalizedSourceRDF")
+    .option("checkpointLocation","sparkoutputs/checkpoints")
+    .queryName("Drugs").start().awaitTermination()
 
-  rdf.repartition(1).writeStream.
+  /*rdf.repartition(1).writeStream.
     trigger(Trigger.ProcessingTime("1 seconds"))
     .format("text").outputMode("append")
     .option("path", "outputs/drugs")
     .option("checkpointLocation","sparkoutputs/checkpoints")
-    .queryName("Drugs").start().awaitTermination()
+    .queryName("Drugs").start().awaitTermination()*/
 
 }

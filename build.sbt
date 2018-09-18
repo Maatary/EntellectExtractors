@@ -15,6 +15,8 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-stream" % "2.5.16",
   "com.typesafe.akka" %% "akka-http-spray-json" % "10.1.4",
   "com.typesafe.akka" %% "akka-stream-kafka" % "0.22",
+  "com.typesafe.akka" % "akka-slf4j_2.11" % "2.5.16",
+  "ch.qos.logback" % "logback-classic" % "1.2.3",
   "com.github.romix.akka" %% "akka-kryo-serialization" % "0.5.0" excludeAll(excludeJpountz),
   "com.esotericsoftware" % "kryo" % "5.0.0-RC1",
   "com.typesafe.slick" %% "slick" % "3.2.3",
