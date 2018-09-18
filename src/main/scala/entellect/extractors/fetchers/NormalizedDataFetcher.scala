@@ -37,7 +37,7 @@ object NormalizedDataFetcher extends App {
   val tableRows =
     Slick.source(sql"""select * FROM DRUG""".as[(Map[String,String])]).log("slick-query-output")
       .withAttributes(Attributes.createLogLevels(
-        Logging.DebugLevel, //onElement
+        Logging.InfoLevel, //onElement
         Logging.InfoLevel,    //onFinish
         Logging.InfoLevel    //onFailure
       ))
