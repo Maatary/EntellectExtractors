@@ -22,7 +22,6 @@ object NormalizedDataMapper extends App {
     .config("spark.executor.memory", "8G")
     .getOrCreate()
 
-  spark.sparkContext.setLogLevel("DEBUG")
 
   val df = spark
     .readStream

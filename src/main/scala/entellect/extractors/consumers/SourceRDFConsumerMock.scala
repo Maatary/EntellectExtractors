@@ -28,6 +28,7 @@ object SourceRDFConsumerMock extends App {
     Consumer
       .plainSource(consumerSettings, Subscriptions.topics("NormalizedSourceRDF"))
       .mapAsyncUnordered(1){cr =>
+        println("got a message to write")
         Future{ByteString(cr.value())}
       }
       .toMat(FileIO.toPath(Paths.get("pp.json-ld")))(Keep.both)
@@ -35,7 +36,7 @@ object SourceRDFConsumerMock extends App {
 
 
   control._2.onComplete{
-    case Failure(exception) => {println(s"table ended with exception ${exception.toString} "); system.terminate()}
+    case Failure(exception) => {println(s"Write ended with exception ${exception.toString} "); system.terminate()}
     case scala.util.Success(value) => println(value) ; system.terminate()
   }
 
