@@ -27,7 +27,7 @@ object NormalizedDataMapper extends App {
     .readStream
     .format("kafka")
     .option("kafka.bootstrap.servers", "127.0.0.1:9092")
-    .option("subscribe", "test")
+    .option("subscribe", "NormalizedRawData")
     .option("startingOffsets", "earliest")
     .option("maxOffsetsPerTrigger", 10000)
     .option("failOnDataLoss", false)
@@ -48,8 +48,8 @@ object NormalizedDataMapper extends App {
       val seqFuture   = groups.foldLeft { Seq(Future.successful(Seq[Row]())) } {(a, b) =>
         a ++ mapRawDataToRowRdf(rdfGenerator, b, context)
       }
-      val futureSeq = Future.sequence(seqFuture)
-      val rdfRows = Await.result(futureSeq, Duration.Inf).flatten
+      val futureSeq   = Future.sequence(seqFuture)
+      val rdfRows     = Await.result(futureSeq, Duration.Inf).flatten
 
       rdfRows.toIterator
 
@@ -68,12 +68,5 @@ object NormalizedDataMapper extends App {
     .option("topic", "NormalizedSourceRDF")
     .option("checkpointLocation","sparkoutputs/checkpoints")
     .queryName("Drugs").start().awaitTermination()
-
-  /*rdf.repartition(1).writeStream.
-    trigger(Trigger.ProcessingTime("1 seconds"))
-    .format("text").outputMode("append")
-    .option("path", "outputs/drugs")
-    .option("checkpointLocation","sparkoutputs/checkpoints")
-    .queryName("Drugs").start().awaitTermination()*/
 
 }
