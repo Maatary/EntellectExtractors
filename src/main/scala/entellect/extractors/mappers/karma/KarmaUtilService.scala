@@ -31,13 +31,14 @@ object KarmaUtilService {
                              values: List[List[String]],
                              modelName: String,
                              sourceName: String,
+                             inputType: InputType,
                              contexMap: ServletContextParameterMap): RDFGeneratorRequest = {
 
     val wrapper         = new RDFGeneratorInputWrapper(headers.asJava, values.map(_.asJava).asJava)
     val request         = new RDFGeneratorRequest(modelName, sourceName)
     request.setInput(wrapper)
     request.setAddProvenance(false)
-    request.setDataType(InputType.OBJECT)
+    request.setDataType(inputType)
     request.addWriter(writer)
     request.setContextParameters(contexMap)
     request

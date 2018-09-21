@@ -5,6 +5,7 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{JsonFraming, Sink, Source}
 import akka.util.ByteString
 import edu.isi.karma.rdf.GenericRDFGenerator
+import edu.isi.karma.rdf.GenericRDFGenerator.InputType
 import edu.isi.karma.webserver.ContextParametersRegistry
 import entellect.extractors.RawData
 import org.apache.spark.sql.Row
@@ -33,7 +34,7 @@ object DataTransformationService {
   }*/
 
   def mapRawDataToRowRdf(rdfGenerator: GenericRDFGenerator,
-                          rawDataList: ((String, String), List[RawData]),
+                          rawDataList: ((String, String), List[RawData]), inputType: InputType,
                           contextParametersRegistry: ContextParametersRegistry)
                          (implicit system: ActorSystem, mat: ActorMaterializer, ec: ExecutionContextExecutor) = {
 
@@ -46,7 +47,7 @@ object DataTransformationService {
     val modelIdentifier = getR2RMLMappingIdentifier(modelName, modelFile)
     rdfGenerator.addModel(modelIdentifier)
     val writer = getRDFWriter(rdfGenerator, modelName)
-    val request = getRDFGeneratorRequest(writer._1, headers, values, modelName, modelName, contextParametersRegistry.getDefault)
+    val request = getRDFGeneratorRequest(writer._1, headers, values, modelName, modelName, inputType, contextParametersRegistry.getDefault)
     rdfGenerator.generateRDF(request)
     val done = Source
       .single(ByteString(writer._2.toString))

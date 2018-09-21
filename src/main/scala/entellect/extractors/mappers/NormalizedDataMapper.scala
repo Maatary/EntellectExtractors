@@ -3,6 +3,7 @@ package entellect.extractors.mappers
 
 
 import edu.isi.karma.rdf.GenericRDFGenerator
+import edu.isi.karma.rdf.GenericRDFGenerator.InputType
 import entellect.extractors._
 import entellect.extractors.mappers.decoder._
 import org.apache.spark.sql.catalyst.encoders.RowEncoder
@@ -46,7 +47,7 @@ object NormalizedDataMapper extends App {
       val rawDataList = decodeData(binaryDfIt.toList, kryoPool)
       val groups      = rawDataList.groupBy(rd => (rd.modelName, rd.sourceType)).toSeq
       val seqFuture   = groups.foldLeft { Seq(Future.successful(Seq[Row]())) } {(a, b) =>
-        a ++ mapRawDataToRowRdf(rdfGenerator, b, context)
+        a ++ mapRawDataToRowRdf(rdfGenerator, b,  InputType.OBJECT, context)
       }
       val futureSeq   = Future.sequence(seqFuture)
       val rdfRows     = Await.result(futureSeq, Duration.Inf).flatten
