@@ -31,7 +31,7 @@ object SourceRDFConsumerMock extends App {
         println("got a message to write")
         Future{ByteString(cr.value())}
       }
-      .toMat(FileIO.toPath(Paths.get("pp.json-ld")))(Keep.both)
+      .toMat(FileIO.toPath(Paths.get("pp.json")))(Keep.both)
       .run()
 
 

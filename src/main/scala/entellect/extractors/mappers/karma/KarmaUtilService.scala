@@ -26,6 +26,8 @@ object KarmaUtilService {
     writer.setGlobalContext(new ContextGenerator(model, true).generateContext, null)
     (writer, sw)
   }
+
+
   def getRDFGeneratorRequest(writer: KR2RMLRDFWriter,
                              headers: List[String],
                              values: List[List[String]],
@@ -43,4 +45,23 @@ object KarmaUtilService {
     request.setContextParameters(contexMap)
     request
   }
+
+  def getRDFGeneratorRequest(writer: KR2RMLRDFWriter,
+                             denormalizedVal: String,
+                             modelName: String,
+                             sourceName: String,
+                             inputType: InputType,
+                             contexMap: ServletContextParameterMap): RDFGeneratorRequest = {
+
+    val wrapper         = new RDFGeneratorInputWrapper(denormalizedVal)
+    val request         = new RDFGeneratorRequest(modelName, sourceName)
+    request.setInput(wrapper)
+    request.setAddProvenance(false)
+    request.setDataType(inputType)
+    request.addWriter(writer)
+    request.setContextParameters(contexMap)
+    request
+  }
+
+
 }

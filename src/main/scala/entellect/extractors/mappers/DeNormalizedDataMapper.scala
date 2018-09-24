@@ -1,8 +1,5 @@
 package entellect.extractors.mappers
 
-
-
-import edu.isi.karma.rdf.GenericRDFGenerator
 import edu.isi.karma.rdf.GenericRDFGenerator.InputType
 import entellect.extractors._
 import entellect.extractors.mappers.decoder._
@@ -15,22 +12,23 @@ import entellect.extractors.mappers.transformations._
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
-object NormalizedDataMapper extends App {
+object DeNormalizedDataMapper extends App {
 
   val spark        = SparkSession.builder()
     .appName("SourceConvertor")
     .master("local[*]")
-    .config("spark.executor.memory", "8G")
+    .config("spark.executor.memory", "12G")
     .getOrCreate()
 
+  spark.conf.set("spark.sql.shuffle.partitions", 8)
 
   val df = spark
     .readStream
     .format("kafka")
     .option("kafka.bootstrap.servers", "127.0.0.1:9092")
-    .option("subscribe", "test")
+    .option("subscribe", "DeNormalizedRawData")
     .option("startingOffsets", "earliest")
-    .option("maxOffsetsPerTrigger", 10000)
+    .option("maxOffsetsPerTrigger", 1000)
     .option("failOnDataLoss", false)
     .load().selectExpr("value as message")
 
@@ -47,7 +45,7 @@ object NormalizedDataMapper extends App {
       val rawDataList = decodeData(binaryDfIt.toList, kryoPool, inputPool)
       val groups      = rawDataList.groupBy(rd => (rd.modelName, rd.sourceType)).toSeq
       val seqFuture   = groups.foldLeft { Seq(Future.successful(Seq[Row]())) } {(a, b) =>
-        a ++ mapRawNormalizedDataToRowRdf(rdfGenerator, b,  InputType.OBJECT, context)
+        a ++ mapRawDeNormalizedDataToRowRdf(rdfGenerator, b,  InputType.JL, context)
       }
       val futureSeq   = Future.sequence(seqFuture)
       val rdfRows     = Await.result(futureSeq, Duration.Inf).flatten
@@ -57,17 +55,24 @@ object NormalizedDataMapper extends App {
     }else
       Iterator[Row]()
   }
-  }(RowEncoder.apply(StructType(List(StructField("value", StringType, false)))))
+  }(RowEncoder.apply(StructType(List(
+        StructField("key", StringType, false),
+        StructField("value", StringType, false)
+      )))
+  )
 
 
   rdf
+    .dropDuplicates("key")
+    //.repartition(8)
+    .drop("key")
     .writeStream
-    .trigger(Trigger.ProcessingTime("1 seconds"))
+    .trigger(Trigger.ProcessingTime("2 seconds"))
     .format("kafka")
     .outputMode("append")
     .option("kafka.bootstrap.servers", "127.0.0.1:9092")
     .option("topic", "NormalizedSourceRDF")
     .option("checkpointLocation","sparkoutputs/checkpoints")
-    .queryName("NormalizedDataMapping").start().awaitTermination()
+    .queryName("DeNormalizedDataMapping").start().awaitTermination()
 
 }

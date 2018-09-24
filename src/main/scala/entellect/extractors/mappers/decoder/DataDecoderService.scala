@@ -11,16 +11,20 @@ import org.apache.spark.sql.Row
 object DataDecoderService {
 
 
-  def decodeData(rowOfBinaryList: List[Row], kryoPool: Pool[Kryo]): List[RawData] = {
+  def decodeData(rowOfBinaryList: List[Row], kryoPool: Pool[Kryo], inputPool: Pool[Input]): List[RawData] = {
 
     val kryo = kryoPool.obtain()
+    val input = inputPool.obtain()
     val data = rowOfBinaryList.map(r => r.getAs[Array[Byte]]("message")).map{ binaryMsg =>
-      val input = new Input(new ByteArrayInputStream(binaryMsg), 4096)
+      /*val input = new Input(new ByteArrayInputStream(binaryMsg), 4096)
+      val value = kryo.readClassAndObject(input).asInstanceOf[RawData]*/
+      input.setInputStream(new ByteArrayInputStream(binaryMsg))
       val value = kryo.readClassAndObject(input).asInstanceOf[RawData]
       input.close()
       value
     }
     kryoPool.free(kryo)
+    inputPool.free(input)
     data
   }
 

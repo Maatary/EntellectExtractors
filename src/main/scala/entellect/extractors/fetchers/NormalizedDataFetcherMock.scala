@@ -21,22 +21,13 @@ import scala.util.Failure
 object NormalizedDataFetcherMock extends App {
 
   import ExecutionContext._
+  import KryoContext._
 
   val config = system.settings.config.getConfig("akka.kafka.producer")
   val producerSettings =
     ProducerSettings(config, new StringSerializer, new ByteArraySerializer)
       .withBootstrapServers("localhost:9092")
 
-  val kryoPool = new Pool[Kryo](true, false, 16) {
-    protected def create(): Kryo = {
-      val kryo = new Kryo()
-      kryo.setRegistrationRequired(false)
-      kryo.addDefaultSerializer(classOf[scala.collection.Map[_,_]], classOf[ScalaImmutableAbstractMapSerializer])
-      kryo.addDefaultSerializer(classOf[scala.collection.generic.MapFactory[scala.collection.Map]], classOf[ScalaImmutableAbstractMapSerializer])
-      kryo.addDefaultSerializer(classOf[RawData], classOf[ScalaProductSerializer])
-      kryo
-    }
-  }
 
   import DrugUtilService._
 
@@ -56,7 +47,7 @@ object NormalizedDataFetcherMock extends App {
       .runWith(Producer.plainSink(producerSettings))
 
   done.onComplete{
-    case Failure(e) => s"Stream failer with exception: ${e.toString}"; system.terminate()
+    case Failure(e) => println(s"Stream failure with exception: ${e.toString}"); system.terminate()
     case _ => system.terminate()
   }
 }

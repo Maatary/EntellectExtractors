@@ -3,6 +3,7 @@ package entellect
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.esotericsoftware.kryo.Kryo
+import com.esotericsoftware.kryo.io.{Input, Output}
 import com.esotericsoftware.kryo.util.Pool
 import com.romix.scala.serialization.kryo.{ScalaImmutableAbstractMapSerializer, ScalaProductSerializer}
 import edu.isi.karma.controller.update.UpdateContainer
@@ -30,6 +31,14 @@ package object extractors {
         kryo.addDefaultSerializer(classOf[RawData], classOf[ScalaProductSerializer])
         kryo
       }
+    }
+
+    lazy val outputPool = new Pool[Output](true, false, 16) {
+      protected def create: Output = new Output(4096)
+    }
+
+    lazy val inputPool = new Pool[Input](true, false, 16) {
+      protected def create: Input = new Input(4096)
     }
   }
 
