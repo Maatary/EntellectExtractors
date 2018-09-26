@@ -28,7 +28,7 @@ object DeNormalizedDataMapper extends App {
     .option("kafka.bootstrap.servers", "127.0.0.1:9092")
     .option("subscribe", "DeNormalizedRawData")
     .option("startingOffsets", "earliest")
-    .option("maxOffsetsPerTrigger", 1000)
+    .option("maxOffsetsPerTrigger", 10000)
     .option("failOnDataLoss", false)
     .load().selectExpr("value as message")
 
@@ -67,7 +67,7 @@ object DeNormalizedDataMapper extends App {
     //.repartition(8)
     .drop("key")
     .writeStream
-    .trigger(Trigger.ProcessingTime("2 seconds"))
+    .trigger(Trigger.ProcessingTime("30 seconds"))
     .format("kafka")
     .outputMode("append")
     .option("kafka.bootstrap.servers", "127.0.0.1:9092")
