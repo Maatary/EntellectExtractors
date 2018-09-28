@@ -6,6 +6,32 @@ scalaVersion := "2.11.12"
 resolvers           += Resolver.mavenLocal
 updateOptions       := updateOptions.value.withLatestSnapshots(false)
 
+
+lazy val common = (
+  Project("common", file("common")).settings()
+)
+
+
+lazy val fetchers = (
+  Project("fetchers", file("fetchers"))
+    .dependsOn(common)
+    .settings()
+  )
+
+lazy val consumers = (
+  Project("consumers", file("consumers"))
+    .dependsOn(common)
+    .settings()
+  )
+
+lazy val mappers = (
+  Project("mappers", file("mappers"))
+    .dependsOn(common)
+    .settings()
+  )
+
+
+
 dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-core" % "2.9.5"
 dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.5"
 dependencyOverrides += "com.fasterxml.jackson.module" % "jackson-module-scala_2.11" % "2.9.5"
@@ -34,3 +60,4 @@ libraryDependencies ++= Seq(
 lazy val excludeJpountz = ExclusionRule(organization = "net.jpountz.lz4", name = "lz4")
 
 lazy val kafkaClients = "org.apache.kafka" % "kafka-clients" % "1.0.1" excludeAll(excludeJpountz)
+
