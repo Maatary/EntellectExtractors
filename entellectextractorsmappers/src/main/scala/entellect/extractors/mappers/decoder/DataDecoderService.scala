@@ -5,7 +5,7 @@ import java.io.ByteArrayInputStream
 import com.esotericsoftware.kryo.Kryo
 import com.esotericsoftware.kryo.io.Input
 import com.esotericsoftware.kryo.util.Pool
-import entellect.extractors.RawData
+import com.elsevier.entellect.commons._
 import org.apache.spark.sql.Row
 
 object DataDecoderService {

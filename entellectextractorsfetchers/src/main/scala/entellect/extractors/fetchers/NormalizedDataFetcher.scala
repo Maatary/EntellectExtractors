@@ -8,7 +8,7 @@ import akka.kafka.scaladsl.Producer
 import akka.stream.Attributes
 import akka.stream.alpakka.slick.scaladsl.Slick
 import com.esotericsoftware.kryo.io.Output
-import entellect.extractors.RawData
+import com.elsevier.entellect.commons._
 import org.apache.kafka.common.serialization.{ByteArraySerializer, StringSerializer}
 import akka.stream.alpakka.slick.scaladsl._
 import akka.stream.scaladsl.{Keep, Merge, Sink, Source}

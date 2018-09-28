@@ -8,6 +8,7 @@ import org.apache.spark.sql.streaming.Trigger
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{Row, SparkSession}
 import entellect.extractors.mappers.transformations._
+import com.elsevier.entellect.commons._
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}

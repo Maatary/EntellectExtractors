@@ -1,6 +1,6 @@
 package entellect.extractors.fetchers
 
-import entellect.extractors._
+import com.elsevier.entellect.commons._
 import java.io.ByteArrayOutputStream
 
 import akka.Done

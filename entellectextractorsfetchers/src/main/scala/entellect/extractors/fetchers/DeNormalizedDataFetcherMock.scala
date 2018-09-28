@@ -9,7 +9,7 @@ import com.esotericsoftware.kryo.io.Output
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
-import entellect.extractors._
+import com.elsevier.entellect.commons._
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.{ByteArraySerializer, StringSerializer}
 

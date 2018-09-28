@@ -9,7 +9,7 @@ import akka.util.ByteString
 import edu.isi.karma.rdf.GenericRDFGenerator
 import edu.isi.karma.rdf.GenericRDFGenerator.InputType
 import edu.isi.karma.webserver.ContextParametersRegistry
-import entellect.extractors.RawData
+import com.elsevier.entellect.commons._
 import org.apache.spark.sql.Row
 import entellect.extractors.mappers.karma._
 import org.apache.jena.rdf.model.{ModelFactory, RDFNode, SimpleSelector}

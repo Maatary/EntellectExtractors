@@ -7,8 +7,8 @@ import akka.kafka.scaladsl.Consumer
 import akka.stream.scaladsl.{FileIO, Keep}
 import akka.util.ByteString
 import org.apache.kafka.clients.consumer.ConsumerConfig
-import org.apache.kafka.common.serialization.{ByteArrayDeserializer, StringDeserializer}
-import entellect.extractors._
+import org.apache.kafka.common.serialization.{StringDeserializer}
+import com.elsevier.entellect.commons._
 
 import scala.concurrent.Future
 import scala.util.Failure
