@@ -52,14 +52,15 @@ lazy val entellectextractorsmappers = project
         case "reference.conf"   => MergeStrategy.concat
         case PathList("META-INF", "services", "org.apache.jena.system.JenaSubsystemLifecycle") => MergeStrategy.concat
         case PathList("META-INF", "services", "org.apache.spark.sql.sources.DataSourceRegister") => MergeStrategy.concat
+        case PathList("META-INF", "services",  xs @ _*) => MergeStrategy.concat
         case PathList("META-INF", xs @ _*) => MergeStrategy.discard
         case x => MergeStrategy.first},
       dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-core" % "2.9.5",
       dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.5",
       dependencyOverrides += "com.fasterxml.jackson.module" % "jackson-module-scala_2.11" % "2.9.5",
-      dependencyOverrides += "org.apache.jena" % "apache-jena" % "3.8.0",
+      dependencyOverrides += "org.apache.jena" % "apache-jena-libs" % "3.8.0" pomOnly(),
       libraryDependencies ++= Seq(
-      "org.apache.jena" % "apache-jena" % "3.8.0",
+      "org.apache.jena" % "apache-jena-libs" % "3.8.0" pomOnly() ,
       "edu.isi" % "karma-offline" % "0.0.1-SNAPSHOT",
       "org.apache.spark" % "spark-core_2.11" % "2.3.1" % "provided",
       "org.apache.spark" % "spark-sql_2.11" % "2.3.1" % "provided",
