@@ -16,8 +16,6 @@ object DataDecoderService {
     val kryo = kryoPool.obtain()
     val input = inputPool.obtain()
     val data = rowOfBinaryList.map(r => r.getAs[Array[Byte]]("message")).map{ binaryMsg =>
-      /*val input = new Input(new ByteArrayInputStream(binaryMsg), 4096)
-      val value = kryo.readClassAndObject(input).asInstanceOf[RawData]*/
       input.setInputStream(new ByteArrayInputStream(binaryMsg))
       val value = kryo.readClassAndObject(input).asInstanceOf[RawData]
       input.close()

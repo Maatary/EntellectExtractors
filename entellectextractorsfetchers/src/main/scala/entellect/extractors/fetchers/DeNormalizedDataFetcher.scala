@@ -13,7 +13,7 @@ import com.elsevier.entellect.commons._
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.{ByteArraySerializer, StringSerializer}
 
-object DeNormalizedDataFetcherMock extends App {
+object DeNormalizedDataFetcher extends App {
 
   import ExecutionContext._
   import KryoContext._

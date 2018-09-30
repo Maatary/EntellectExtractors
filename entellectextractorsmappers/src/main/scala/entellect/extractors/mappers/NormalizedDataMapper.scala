@@ -18,9 +18,9 @@ import scala.concurrent.{Await, Future}
 object NormalizedDataMapper extends App {
 
   val spark        = SparkSession.builder()
-    .appName("SourceConvertor")
-    .master("local[*]")
-    .config("spark.executor.memory", "8G")
+    //.appName("SourceConvertor")
+    //.master("local[*]")
+    //.config("spark.executor.memory", "8G")
     .getOrCreate()
 
   val df = spark
@@ -68,5 +68,4 @@ object NormalizedDataMapper extends App {
     .option("topic", "NormalizedSourceRDF")
     .option("checkpointLocation","sparkoutputs/checkpoints")
     .queryName("NormalizedDataMapping").start().awaitTermination()
-
 }

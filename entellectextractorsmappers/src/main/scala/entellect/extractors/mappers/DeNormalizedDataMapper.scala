@@ -16,12 +16,13 @@ import scala.concurrent.{Await, Future}
 object DeNormalizedDataMapper extends App {
 
   val spark        = SparkSession.builder()
-    .appName("SourceConvertor")
+    /*.appName("DeNormalizedDataMapper")
     .master("local[*]")
     .config("spark.executor.memory", "12G")
+    .config("spark.sql.shuffle.partitions", 7)*/
     .getOrCreate()
 
-  spark.conf.set("spark.sql.shuffle.partitions", 8)
+
 
   val df = spark
     .readStream
@@ -65,7 +66,6 @@ object DeNormalizedDataMapper extends App {
 
   rdf
     .dropDuplicates("key")
-    //.repartition(8)
     .drop("key")
     .writeStream
     .trigger(Trigger.ProcessingTime("30 seconds"))

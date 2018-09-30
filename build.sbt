@@ -44,9 +44,16 @@ lazy val entellectextractorsconsumers = project
   .dependsOn(entellectextractorscommon)
 
 lazy val entellectextractorsmappers = project
-  .dependsOn(entellectextractorscommon)
   .settings(
       commonSettings,
+      mainClass in assembly := Some("entellect.extractors.mappers.NormalizedDataMapper"),
+      assemblyMergeStrategy in assembly := {
+        case "application.conf" => MergeStrategy.concat
+        case "reference.conf"   => MergeStrategy.concat
+        case PathList("META-INF", "services", "org.apache.jena.system.JenaSubsystemLifecycle") => MergeStrategy.concat
+        case PathList("META-INF", "services", "org.apache.spark.sql.sources.DataSourceRegister") => MergeStrategy.concat
+        case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+        case x => MergeStrategy.first},
       dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-core" % "2.9.5",
       dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.5",
       dependencyOverrides += "com.fasterxml.jackson.module" % "jackson-module-scala_2.11" % "2.9.5",
@@ -54,11 +61,12 @@ lazy val entellectextractorsmappers = project
       libraryDependencies ++= Seq(
       "org.apache.jena" % "apache-jena" % "3.8.0",
       "edu.isi" % "karma-offline" % "0.0.1-SNAPSHOT",
-      "org.apache.spark" % "spark-core_2.11" % "2.3.1",
-      "org.apache.spark" % "spark-sql_2.11" % "2.3.1",
-      "org.apache.spark" % "spark-sql-kafka-0-10_2.11" % "2.3.1"
+      "org.apache.spark" % "spark-core_2.11" % "2.3.1" % "provided",
+      "org.apache.spark" % "spark-sql_2.11" % "2.3.1" % "provided",
+      "org.apache.spark" %% "spark-sql-kafka-0-10" % "2.3.1"
       //"com.datastax.cassandra" % "cassandra-driver-core" % "3.5.1"
     ))
+  .dependsOn(entellectextractorscommon)
 
 
 

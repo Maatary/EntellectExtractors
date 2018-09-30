@@ -17,7 +17,9 @@ package object commons {
   object KryoContext {
     lazy val kryoPool = new Pool[Kryo](true, false, 16) {
       protected def create(): Kryo = {
+        val cl = Thread.currentThread().getContextClassLoader()
         val kryo = new Kryo()
+        kryo.setClassLoader(cl)
         kryo.setRegistrationRequired(false)
         kryo.addDefaultSerializer(classOf[scala.collection.Map[_,_]], classOf[ScalaImmutableAbstractMapSerializer])
         kryo.addDefaultSerializer(classOf[scala.collection.generic.MapFactory[scala.collection.Map]], classOf[ScalaImmutableAbstractMapSerializer])
